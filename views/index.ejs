@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TechShop - Catálogo de Produtos</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/" style="text-decoration: none; color: white;"><h2>TechShop</h2></a>
+        </div>
+        <nav>
+            <a href="/">Home</a>
+            
+            <% if (user) { %>
+                <% if (user.role === 'seller') { %>
+                    <a href="/admin/add-product" style="color: #fbbf24;">+ Novo Produto</a>
+                <% } %>
+                <a href="/logout" style="color: var(--danger);">Sair</a>
+            <% } else { %>
+                <a href="/login">Login</a>
+                <a href="/register">Cadastrar</a>
+            <% } %>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+            <div>
+                <h1>Nossos Produtos</h1>
+                <p>As melhores ofertas em tecnologia para o seu dia a dia.</p>
+            </div>
+            <% if (user) { %>
+                <div style="background: #e2e8f0; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem;">
+                    Olá, <strong><%= user.id %></strong> 
+                    <span style="background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px; font-size: 0.75rem; text-transform: uppercase;">
+                        <%= user.role %>
+                    </span>
+                </div>
+            <% } %>
+        </div>
+
+        <div class="product-grid">
+            <% if (products.length === 0) { %>
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: white; border-radius: 12px;">
+                    <h3>Nenhum produto encontrado.</h3>
+                    <p>Volte mais tarde ou realize o login como vendedor para cadastrar.</p>
+                </div>
+            <% } %>
+
+            <% products.forEach(product => { %>
+                <div class="product-card">
+                    <h3><%= product.name %></h3>
+                    <p style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 10px;">
+                        <%= product.description %>
+                    </p>
+                    <p class="price">R$ <%= product.price %></p>
+                    <p style="margin-bottom: 15px;"><small>Estoque: <strong><%= product.stock %></strong> unidades</small></p>
+                    
+                    <a href="/product/<%= product.id %>" class="btn-detalhes">Ver Detalhes</a>
+
+                    <% if (user && user.role === 'seller') { %>
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid #eee; pt: 10px;">
+                            <a href="/admin/edit-product/<%= product.id %>" 
+                                style="background: var(--primary); color: white; text-decoration: none; padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; text-align: center; margin-top: 10px;">
+                                Editar Produto
+                            </a>
+
+                            <form action="/products/delete/<%= product.id %>" method="POST" onsubmit="return confirm('Deseja mesmo excluir este produto?')">
+                                <button type="submit" class="btn-danger" style="margin-top: 0; width: 100%;">
+                                    Excluir Produto
+                                </button>
+                            </form>
+                        </div>
+                    <% } %>
+                </div>
+            <% }); %>
+        </div>
+    </div>
+</body>
+</html>

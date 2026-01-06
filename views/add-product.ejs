@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Produto - TechShop Admin</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <div class="container-central">
+        <div class="auth-card" style="max-width: 500px;"> <h1>Novo Produto</h1>
+            <p>Preencha os dados para adicionar ao catálogo.</p>
+
+            <form action="/products" method="POST">
+                <div class="form-group">
+                    <label for="name">Nome do Produto:</label>
+                    <input type="text" id="name" name="name" required placeholder="Ex: Monitor Gamer 24'">
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label for="price">Preço (R$):</label>
+                        <input type="number" id="price" name="price" step="0.01" required placeholder="0.00">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label for="stock">Estoque:</label>
+                        <input type="number" id="stock" name="stock" required min="0" value="1">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descrição do Produto:</label>
+                    <textarea id="description" name="description" rows="4" placeholder="Detalhes técnicos e diferenciais..."></textarea>
+                </div>
+
+                <button type="submit">Cadastrar Produto</button>
+            </form>
+
+            <div class="auth-footer">
+                <p><a href="/">Cancelar e voltar ao início</a></p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
