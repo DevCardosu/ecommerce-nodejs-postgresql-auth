@@ -1,6 +1,6 @@
 # 🛒 TechShop MVP - E-commerce Backend
 
-Este é um projeto de E-commerce funcional desenvolvido como parte dos meus estudos em **Análise e Desenvolvimento de Sistemas**. O foco principal foi a criação de um sistema robusto de gerenciamento de produtos com autenticação segura.
+Este é um projeto de E-commerce funcional desenvolvido como parte dos meus estudos em **Desenvolvimento de Sistemas**. O foco principal foi a criação de um sistema robusto de gerenciamento de produtos com autenticação segura.
 
 ## 🚀 Funcionalidades
 - **Autenticação Completa**: Login e Registro de usuários com senhas criptografadas (Bcrypt).
