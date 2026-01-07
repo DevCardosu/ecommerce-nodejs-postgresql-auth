@@ -11,35 +11,34 @@ const app = express();
 // --- 1. CONFIGURAÇÕES E MIDDLEWARES ---
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
-app.use(cookieParser()); // Necessário para ler o token dos cookies
+app.use(cookieParser()); 
 app.use(express.static('public'));
 app.set('view engine', 'ejs');
 
+// MIDDLEWARE GLOBAL: Disponibiliza 'user' para TODOS os templates EJS automaticamente
+app.use((req, res, next) => {
+    const token = req.cookies.token;
+    res.locals.user = null; // Valor padrão se não estiver logado
+
+    if (token) {
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            res.locals.user = decoded; // Agora 'user' existe em qualquer .render()
+        } catch (err) {
+            // Se o token for inválido, o user continua null
+        }
+    }
+    next();
+});
+
 // --- 2. ROTAS DE NAVEGAÇÃO (GET) ---
 
-// Rota principal: Busca produtos e identifica se há usuário logado
+// Catálogo Principal
 app.get('/', async (req, res) => {
     try {
         const result = await pool.query('SELECT * FROM products');
-        
-        // Verifica se existe um usuário logado para passar ao index.ejs
-        let user = null;
-        const token = req.cookies.token;
-
-        if (token) {
-            try {
-                // Decodifica o token para pegar ID e Cargo (role)
-                user = jwt.verify(token, process.env.JWT_SECRET);
-            } catch (err) {
-                // Se o token for inválido, user permanece null
-            }
-        }
-
-        // Passamos 'user' (mesmo que seja null) para evitar o ReferenceError
-        res.render('index', { 
-            products: result.rows, 
-            user: user 
-        });
+        // Não precisa mais passar 'user: user' manualmente!
+        res.render('index', { products: result.rows });
     } catch (err) {
         console.error(err);
         res.status(500).send('Erro no servidor');
@@ -49,26 +48,43 @@ app.get('/', async (req, res) => {
 app.get('/register', (req, res) => res.render('register'));
 app.get('/login', (req, res) => res.render('login'));
 
-// Rota protegida para ver o formulário de cadastro de produto
-app.get('/admin/add-product', verificarToken, verificarRole('seller'), (req, res) => {
-    res.render('add-product');
-});
-
-// Detalhes do produto
+// Detalhes de um Produto Específico
 app.get('/product/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
-        if (result.rows.length === 0) return res.status(404).send('Produto não encontrado');
+        
+        if (result.rows.length === 0) {
+            return res.status(404).send('Produto não encontrado');
+        }
+
         res.render('product', { product: result.rows[0] });
     } catch (err) {
-        res.status(500).send('Erro ao buscar produto');
+        console.error(err);
+        res.status(500).send('Erro ao carregar detalhes do produto');
+    }
+});
+
+// Rota para ver o formulário de cadastro (Apenas Vendedores)
+app.get('/admin/add-product', verificarToken, verificarRole('seller'), (req, res) => {
+    res.render('add-product');
+});
+
+// Rota para formulário de edição (Apenas Vendedores)
+app.get('/admin/edit-product/:id', verificarToken, verificarRole('seller'), async (req, res) => {
+    const { id } = req.params;
+    try {
+        const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
+        if (result.rows.length === 0) return res.status(404).send('Produto não encontrado');
+
+        res.render('edit-product', { product: result.rows[0] });
+    } catch (err) {
+        res.status(500).send('Erro ao carregar dados do produto');
     }
 });
 
 // --- 3. ROTAS DE LÓGICA (POST) ---
 
-// Cadastro de Usuário
 app.post('/register', async (req, res) => {
     const { username, password, role } = req.body;
     try {
@@ -86,7 +102,6 @@ app.post('/register', async (req, res) => {
     }
 });
 
-// Login do Usuário
 app.post('/login', async (req, res) => { 
     const { username, password } = req.body;
     try {
@@ -98,14 +113,12 @@ app.post('/login', async (req, res) => {
 
         if(!isMatch) return res.status(400).send('Senha incorreta!');
 
-        // Geração do token
         const token = jwt.sign(
-            { id: user.id, role: user.role },
+            { id: user.id, role: user.role, username: user.username },
             process.env.JWT_SECRET,
             { expiresIn: '1h' }
         );
 
-        // Salva nos cookies do navegador
         res.cookie('token', token, { httpOnly: true });
         res.redirect('/');
         
@@ -115,7 +128,6 @@ app.post('/login', async (req, res) => {
     }
 });
 
-// Salvar Novo Produto (Apenas Vendedores)
 app.post('/products', verificarToken, verificarRole('seller'), async (req, res) => {
     const { name, price, description, stock } = req.body;
     try {
@@ -129,7 +141,20 @@ app.post('/products', verificarToken, verificarRole('seller'), async (req, res) 
     }
 });
 
-// Excluir Produto (Apenas Vendedores)
+app.post('/products/update/:id', verificarToken, verificarRole('seller'), async (req, res) => {
+    const { id } = req.params;
+    const { name, price, description, stock } = req.body;
+    try {
+        await pool.query(
+            'UPDATE products SET name = $1, price = $2, description = $3, stock = $4 WHERE id = $5',
+            [name, price, description, stock, id]
+        );
+        res.redirect(`/product/${id}`); // Redireciona para a página do produto editado
+    } catch (err) {
+        res.status(500).send('Erro ao atualizar produto');
+    }
+});
+
 app.post('/products/delete/:id', verificarToken, verificarRole('seller'), async (req, res) => {
     const { id } = req.params;
     try {
@@ -140,47 +165,12 @@ app.post('/products/delete/:id', verificarToken, verificarRole('seller'), async 
     }
 });
 
-// Logout: Limpa o cookie e redireciona
 app.get('/logout', (req, res) => {
     res.clearCookie('token');
     res.redirect('/');
 });
 
-// 1. Rota para mostrar o formulário de edição com os dados atuais
-app.get('/admin/edit-product/:id', verificarToken, verificarRole('seller'), async (req, res) => {
-    const { id } = req.params;
-    try {
-        const result = await pool.query('SELECT * FROM products WHERE id = $1', [id]);
-        if (result.rows.length === 0) return res.status(404).send('Produto não encontrado');
-
-        // Passamos o produto encontrado e o usuário logado para o EJS
-        res.render('edit-product', { 
-            product: result.rows[0],
-            user: req.user 
-        });
-    } catch (err) {
-        res.status(500).send('Erro ao carregar dados do produto');
-    }
-});
-
-// 2. Rota para processar a atualização dos dados
-app.post('/products/update/:id', verificarToken, verificarRole('seller'), async (req, res) => {
-    const { id } = req.params;
-    const { name, price, description, stock } = req.body;
-    try {
-        await pool.query(
-            'UPDATE products SET name = $1, price = $2, description = $3, stock = $4 WHERE id = $5',
-            [name, price, description, stock, id]
-        );
-        res.redirect('/'); // Redireciona para o catálogo atualizado
-    } catch (err) {
-        console.error(err);
-        res.status(500).send('Erro ao atualizar produto');
-    }
-});
-
 // --- 4. INICIALIZAÇÃO ---
-
 pool.on('error', (err) => {
     console.error('Erro inesperado no banco de dados', err);
     process.exit(-1);

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= product.name %> - TechShop</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <a href="/" style="color: white; text-decoration: none;"><h2>TechShop</h2></a>
+        </div>
+        <nav>
+            <a href="/">Voltar ao Catálogo</a>
+            <% if (locals.user) { %>
+                <span style="color: white; margin-right: 10px;">Olá, <%= user.username %></span>
+                <a href="/logout">Sair</a>
+            <% } else { %>
+                <a href="/login">Login</a>
+            <% } %>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="product-detail-container">
+            <div class="product-image-placeholder">
+                <span style="font-size: 5rem;">📦</span>
+                <p>Sem Imagem</p>
+            </div>
+
+            <div class="product-info">
+                <h1><%= product.name %></h1>
+                <p class="category">Categoria: Hardware</p>
+                <p class="price">R$ <%= product.price %></p>
+                <p class="stock">Disponibilidade: <strong><%= product.stock %> em estoque</strong></p>
+                
+                <div class="description-box">
+                    <h3>Descrição</h3>
+                    <p><%= product.description %></p>
+                </div>
+
+                <button class="btn-buy">Adicionar ao Carrinho</button>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+                <% if (locals.user && user.role === 'seller') { %>
+                    <div class="admin-actions">
+                        <p style="color: #666; font-size: 0.9rem; margin-bottom: 10px;">Painel de Vendedor:</p>
+                        
+                        <a href="/admin/edit-product/<%= product.id %>" class="btn-edit">
+                            Editar Dados
+                        </a>
+
+                        <form action="/products/delete/<%= product.id %>" method="POST" style="display: inline;" onsubmit="return confirm('ATENÇÃO: Deseja realmente excluir este produto?')">
+                            <button type="submit" class="btn-delete">Excluir Produto</button>
+                        </form>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
