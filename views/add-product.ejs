@@ -3,43 +3,166 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novo Produto - TechShop Admin</title>
+    <title>Cadastrar Produto - TechShop</title>
     <link rel="stylesheet" href="/styles.css">
+    <style>
+        /* Estilos específicos para o formulário */
+        .form-container {
+            max-width: 600px;
+            margin: 40px auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group textarea,
+        .form-group input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            box-sizing: border-box; /* Garante que o padding não aumente a largura */
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            height: 120px;
+        }
+
+        .btn-submit {
+            background-color: #27ae60;
+            color: white;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: bold;
+            width: 100%;
+            transition: background 0.3s;
+        }
+
+        .btn-submit:hover {
+            background-color: #219150;
+        }
+
+        .back-link {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            text-decoration: none;
+        }
+    </style>
 </head>
 <body>
-    <div class="container-central">
-        <div class="auth-card" style="max-width: 500px;"> <h1>Novo Produto</h1>
-            <p>Preencha os dados para adicionar ao catálogo.</p>
+    <header>
+        <div class="logo">
+            <a href="/" style="color: white; text-decoration: none;"><h2>TechShop</h2></a>
+        </div>
+        <nav>
+            <a href="/">Início</a>
+            <% if (locals.user) { %>
+                <span style="color: white; margin-right: 10px;">Vendedor: <strong><%= user.username %></strong></span>
+                <a href="/logout">Sair</a>
+            <% } %>
+        </nav>
+    </header>
 
-            <form action="/products" method="POST">
+    <div class="container">
+        <div class="form-container">
+            <h1 style="margin-top: 0; color: #2c3e50;">Cadastrar Novo Produto</h1>
+            
+            <form action="/products" method="POST" enctype="multipart/form-data">
+                
                 <div class="form-group">
-                    <label for="name">Nome do Produto:</label>
-                    <input type="text" id="name" name="name" required placeholder="Ex: Monitor Gamer 24'">
-                </div>
-
-                <div style="display: flex; gap: 15px;">
-                    <div class="form-group" style="flex: 1;">
-                        <label for="price">Preço (R$):</label>
-                        <input type="number" id="price" name="price" step="0.01" required placeholder="0.00">
-                    </div>
-                    <div class="form-group" style="flex: 1;">
-                        <label for="stock">Estoque:</label>
-                        <input type="number" id="stock" name="stock" required min="0" value="1">
-                    </div>
+                    <label for="name">Nome do Produto</label>
+                    <input type="text" id="name" name="name" placeholder="Ex: Teclado Mecânico RGB" required>
                 </div>
 
                 <div class="form-group">
-                    <label for="description">Descrição do Produto:</label>
-                    <textarea id="description" name="description" rows="4" placeholder="Detalhes técnicos e diferenciais..."></textarea>
+                    <label for="price">Preço (R$)</label>
+                    <input type="number" id="price" name="price" step="0.01" placeholder="0.00" required>
                 </div>
 
-                <button type="submit">Cadastrar Produto</button>
+                <div class="form-group">
+                    <label for="stock">Quantidade em Estoque</label>
+                    <input type="number" id="stock" name="stock" placeholder="Ex: 10" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="description">Descrição Detalhada</label>
+                    <textarea id="description" name="description" placeholder="Descreva as especificações do produto..." required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="image">Foto do Produto (Opcional)</label>
+                    <input type="file" id="image" name="image" accept="image/*">
+                    <small style="color: #888;">Formatos aceitos: JPG, PNG, GIF.</small>
+                </div>
+
+                <button type="submit" class="btn-submit">Publicar Produto</button>
             </form>
 
-            <div class="auth-footer">
-                <p><a href="/">Cancelar e voltar ao início</a></p>
-            </div>
+            <a href="/" class="back-link">← Cancelar e voltar</a>
         </div>
     </div>
+    <footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>TechShop</h3>
+            <p>Sua loja de tecnologia com as melhores ofertas em hardware e periféricos de alta performance.</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">GitHub</a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h4>Navegação</h4>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Cadastrar</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Ajuda e Suporte</h4>
+            <ul>
+                <li><a href="#">F.A.Q</a></li>
+                <li><a href="#">Termos de Uso</a></li>
+                <li><a href="#">Privacidade</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Contato</h4>
+            <p>📍 Av. Tecnologia, 1024</p>
+            <p>📧 suporte@techshop.com</p>
+            <p>📞 (11) 9999-9999</p>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; 2026 TechShop - Todos os direitos reservados. Desenvolvido por Kelltech Informática.</p>
+    </div>
+</footer>
 </body>
 </html>

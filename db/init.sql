@@ -4,6 +4,7 @@ CREATE TABLE products (
     price DECIMAL(10,2) NOT NULL,
     description TEXT,
     stock INT DEFAULT 0
+    image_url TEXT
 );
 
 CREATE TABLE users (

@@ -14,7 +14,7 @@
         <nav>
             <a href="/">Home</a>
             
-            <% if (user) { %>
+            <% if (locals.user) { %>
                 <% if (user.role === 'seller') { %>
                     <a href="/admin/add-product" style="color: #fbbf24;">+ Novo Produto</a>
                 <% } %>
@@ -27,50 +27,81 @@
     </header>
 
     <div class="container">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; margin-top: 2rem;">
             <div>
                 <h1>Nossos Produtos</h1>
                 <p>As melhores ofertas em tecnologia para o seu dia a dia.</p>
             </div>
-            <% if (user) { %>
+            <% if (locals.user) { %>
                 <div style="background: #e2e8f0; padding: 10px 15px; border-radius: 8px; font-size: 0.9rem;">
-                    Olá, <strong><%= user.id %></strong> 
-                    <span style="background: var(--primary); color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px; font-size: 0.75rem; text-transform: uppercase;">
+                    Olá, <strong><%= user.username %></strong> 
+                    <span style="background: #3498db; color: white; padding: 2px 6px; border-radius: 4px; margin-left: 5px; font-size: 0.75rem; text-transform: uppercase;">
                         <%= user.role %>
                     </span>
                 </div>
             <% } %>
         </div>
 
+        <section class="search-area" style="margin-bottom: 2.5rem;">
+            <form action="/" method="GET" style="display: flex; gap: 10px; max-width: 600px;">
+                <input 
+                    type="text" 
+                    name="search" 
+                    placeholder="Pesquisar produtos..." 
+                    value="<%= locals.searchTerm || '' %>" 
+                    style="flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem;"
+                >
+                <button type="submit" style="padding: 12px 20px; background: #3498db; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold;">
+                    Buscar
+                </button>
+                <% if (locals.searchTerm) { %>
+                    <a href="/" style="padding: 12px; color: #e74c3c; text-decoration: none; font-size: 0.9rem;">Limpar</a>
+                <% } %>
+            </form>
+        </section>
+
         <div class="product-grid">
             <% if (products.length === 0) { %>
-                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: white; border-radius: 12px;">
+                <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: white; border-radius: 12px; border: 1px dashed #ccc;">
                     <h3>Nenhum produto encontrado.</h3>
-                    <p>Volte mais tarde ou realize o login como vendedor para cadastrar.</p>
+                    <p>Tente outro termo ou limpe a busca.</p>
                 </div>
             <% } %>
 
             <% products.forEach(product => { %>
-                <div class="product-card">
-                    <h3><%= product.name %></h3>
-                    <p style="color: var(--secondary); font-size: 0.9rem; margin-bottom: 10px;">
-                        <%= product.description %>
-                    </p>
-                    <p class="price">R$ <%= product.price %></p>
-                    <p style="margin-bottom: 15px;"><small>Estoque: <strong><%= product.stock %></strong> unidades</small></p>
-                    
-                    <a href="/product/<%= product.id %>" class="btn-detalhes">Ver Detalhes</a>
+                <div class="product-card" style="display: flex; flex-direction: column;">
+                    <div style="height: 180px; background: #f9f9f9; display: flex; align-items: center; justify-content: center; border-radius: 8px; margin-bottom: 15px; overflow: hidden; border: 1px solid #eee;">
+                        <% if (product.image_url) { %>
+                            <img src="<%= product.image_url %>" alt="<%= product.name %>" style="width: 100%; height: 100%; object-fit: cover;">
+                        <% } else { %>
+                            <span style="font-size: 3rem; opacity: 0.3;">📦</span>
+                        <% } %>
+                    </div>
 
-                    <% if (user && user.role === 'seller') { %>
-                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px; border-top: 1px solid #eee; pt: 10px;">
+                    <h3 style="margin-bottom: 5px;"><%= product.name %></h3>
+                    
+                    <p style="color: #666; font-size: 0.85rem; margin-bottom: 10px; flex-grow: 1;">
+                        <%= product.description.substring(0, 80) %><%= product.description.length > 80 ? '...' : '' %>
+                    </p>
+
+                    <p class="price" style="font-size: 1.25rem; font-weight: bold; color: #2ecc71; margin-bottom: 5px;">
+                        R$ <%= Number(product.price).toLocaleString('pt-BR', { minimumFractionDigits: 2 }) %>
+                    </p>
+                    
+                    <p style="margin-bottom: 15px;"><small>Estoque: <strong><%= product.stock %></strong> un.</small></p>
+                    
+                    <a href="/product/<%= product.id %>" class="btn-detalhes" style="text-align: center;">Ver Detalhes</a>
+
+                    <% if (locals.user && user.role === 'seller') { %>
+                        <div style="display: flex; gap: 8px; margin-top: 12px; border-top: 1px solid #eee; padding-top: 12px;">
                             <a href="/admin/edit-product/<%= product.id %>" 
-                                style="background: var(--primary); color: white; text-decoration: none; padding: 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; text-align: center; margin-top: 10px;">
-                                Editar Produto
+                                style="flex: 1; background: #f39c12; color: white; text-decoration: none; padding: 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; text-align: center;">
+                                Editar
                             </a>
 
-                            <form action="/products/delete/<%= product.id %>" method="POST" onsubmit="return confirm('Deseja mesmo excluir este produto?')">
-                                <button type="submit" class="btn-danger" style="margin-top: 0; width: 100%;">
-                                    Excluir Produto
+                            <form action="/products/delete/<%= product.id %>" method="POST" onsubmit="return confirm('Deseja mesmo excluir?')" style="flex: 1;">
+                                <button type="submit" class="btn-danger" style="margin-top: 0; width: 100%; padding: 8px; font-size: 0.75rem;">
+                                    Excluir
                                 </button>
                             </form>
                         </div>
@@ -79,5 +110,47 @@
             <% }); %>
         </div>
     </div>
+    <footer>
+    <div class="footer-container">
+        <div class="footer-section">
+            <h3>TechShop</h3>
+            <p>Sua loja de tecnologia com as melhores ofertas em hardware e periféricos de alta performance.</p>
+            <div class="social-links">
+                <a href="#">Instagram</a>
+                <a href="#">LinkedIn</a>
+                <a href="#">GitHub</a>
+            </div>
+        </div>
+
+        <div class="footer-section">
+            <h4>Navegação</h4>
+            <ul>
+                <li><a href="/">Home</a></li>
+                <li><a href="/login">Login</a></li>
+                <li><a href="/register">Cadastrar</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Ajuda e Suporte</h4>
+            <ul>
+                <li><a href="#">F.A.Q</a></li>
+                <li><a href="#">Termos de Uso</a></li>
+                <li><a href="#">Privacidade</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-section">
+            <h4>Contato</h4>
+            <p>📍 Av. Tecnologia, 1024</p>
+            <p>📧 suporte@techshop.com</p>
+            <p>📞 (11) 9999-9999</p>
+        </div>
+    </div>
+    
+    <div class="footer-bottom">
+        <p>&copy; 2026 TechShop - Todos os direitos reservados. Desenvolvido por Kelltech Informática.</p>
+    </div>
+</footer>
 </body>
 </html>
