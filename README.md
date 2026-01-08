@@ -1,48 +1,153 @@
-🛒 TechShop MVP - E-commerce Full-Stack
-Este é um projeto de E-commerce funcional desenvolvido como parte dos meus estudos em Análise e Desenvolvimento de Sistemas. O foco principal foi a criação de um sistema robusto de gerenciamento de produtos com autenticação segura, upload de arquivos e experiência de usuário otimizada.
+# 🛒 TechShop MVP — E-commerce Full‑Stack
 
-🚀 Novas Funcionalidades & Ajustes Recentes
-🖼️ Gerenciamento de Imagens: Implementação de upload de fotos reais dos produtos utilizando a biblioteca Multer, com armazenamento local e persistência do caminho no banco de dados.
+Projeto **full‑stack** de E‑commerce desenvolvido com foco em **boas práticas de backend, segurança, organização de código e fundamentos de frontend**, visando **oportunidades de estágio em programação (Frontend / Full‑Stack)**.
 
-🔍 Busca Dinâmica: Barra de pesquisa funcional no catálogo que utiliza filtros ILIKE no PostgreSQL para encontrar produtos por nome em tempo real.
+Este projeto foi construído como parte dos meus estudos em **Análise e Desenvolvimento de Sistemas**, simulando funcionalidades reais encontradas em sistemas comerciais.
 
-🛡️ Middleware Global de Sessão: Otimização do backend para disponibilizar os dados do usuário logado (via JWT) para todos os templates EJS automaticamente, eliminando erros de referência.
+---
 
-🎨 UI/UX Minimalista: Layout responsivo com CSS Moderno, incluindo um rodapé (footer) compacto e profissional, além de botões administrativos intuitivos.
+## 🎯 Objetivo do Projeto
 
-🛠️ Funcionalidades Principais
-Autenticação Completa: Login e Registro com senhas criptografadas via Bcryptjs.
+Demonstrar, na prática:
 
-Controle de Acesso (RBAC): Diferenciação de permissões entre Cliente e Vendedor (Seller).
+* Criação de uma aplicação web completa (do banco ao frontend)
+* Autenticação e autorização de usuários
+* Controle de acesso por perfil (RBAC)
+* Manipulação de arquivos
+* Integração entre backend, banco de dados e interface
 
-CRUD de Produtos: Vendedores possuem painel exclusivo para criar, editar (incluindo troca de imagem) e excluir itens.
+---
 
-Segurança: Proteção de rotas via JWT (JSON Web Tokens) e armazenamento seguro através de Cookies HTTP-only.
+## 🚀 Funcionalidades Implementadas
 
-Persistência: Banco de dados relacional PostgreSQL.
+### 🔐 Autenticação & Segurança
 
-💻 Tecnologias Utilizadas
-Node.js & Express (Ambiente e Framework)
+* Registro e login de usuários
+* Senhas criptografadas com **Bcryptjs**
+* Autenticação baseada em **JWT**
+* Sessões armazenadas em **Cookies HTTP‑only**
+* Proteção de rotas por middleware
 
-PostgreSQL (Banco de Dados)
+### 👥 Controle de Acesso (RBAC)
 
-EJS (View Engine para renderização dinâmica)
+* **Cliente**: visualiza produtos
+* **Vendedor (Seller)**: gerencia produtos
+* Middleware de permissão por tipo de usuário
 
-Multer (Processamento de uploads de arquivos)
+### 📦 Gerenciamento de Produtos
 
-JWT & Cookie-parser (Gestão de autenticação e sessão)
+* CRUD completo de produtos
+* Upload e troca de imagens dos produtos
+* Armazenamento local das imagens
+* Persistência do caminho da imagem no banco
 
-Bcryptjs (Segurança e hashing de credenciais)
+### 🔍 Busca Dinâmica
 
-📦 Como rodar o projeto
-Clone o repositório.
+* Barra de pesquisa funcional no catálogo
+* Filtros utilizando **ILIKE** no PostgreSQL
+* Busca em tempo real por nome do produto
 
-Execute npm install.
+### 🧠 Middleware Global de Sessão
 
-Importante: Crie a pasta public/uploads na raiz do projeto.
+* Middleware que injeta automaticamente os dados do usuário logado em todas as views **EJS**
+* Elimina repetição de lógica e erros de referência
 
-Configure o arquivo .env com suas credenciais do banco e JWT_SECRET.
+### 🎨 UI / UX
 
-Execute as queries SQL para criar as tabelas users e products (certifique-se de incluir a coluna image_url na tabela de produtos).
+* Layout responsivo
+* Interface minimalista e funcional
+* Botões administrativos claros
+* Footer compacto e profissional
 
-Inicie o servidor com npm run dev.
+---
+
+## 🛠️ Tecnologias Utilizadas
+
+### Backend
+
+* **Node.js**
+* **Express.js**
+* **JWT** (autenticação)
+* **Bcryptjs** (hash de senhas)
+* **Multer** (upload de arquivos)
+
+### Frontend
+
+* **EJS** (renderização dinâmica)
+* **CSS moderno**
+
+### Banco de Dados
+
+* **PostgreSQL**
+
+---
+
+## 📦 Como Rodar o Projeto Localmente
+
+1. Clone o repositório:
+
+```bash
+git clone <url-do-repositorio>
+```
+
+2. Instale as dependências:
+
+```bash
+npm install
+```
+
+3. Crie a pasta de uploads:
+
+```bash
+public/uploads
+```
+
+4. Configure o arquivo `.env`:
+
+```env
+DB_HOST=
+DB_USER=
+DB_PASSWORD=
+DB_NAME=
+JWT_SECRET=
+```
+
+5. Crie as tabelas no PostgreSQL:
+
+* `users`
+* `products` (incluindo a coluna `image_url`)
+
+6. Inicie o servidor:
+
+```bash
+npm run dev
+```
+
+---
+
+## 📌 Aprendizados Demonstrados
+
+* Arquitetura básica MVC
+* Criação de APIs com Express
+* Segurança em aplicações web
+* Autenticação baseada em tokens
+* Integração frontend + backend
+* Uso de banco de dados relacional
+* Manipulação de arquivos no servidor
+
+---
+
+## 🎯 Próximos Passos (Evoluções Planejadas)
+
+* Paginação de produtos
+* Validação de formulários no frontend
+* Melhorias de acessibilidade
+* Deploy em ambiente de produção
+
+---
+
+## 👨‍💻 Autor
+
+Projeto desenvolvido por **DevCardosu**, estudante de **Análise e Desenvolvimento de Sistemas**, com foco em **estágio Frontend / Full‑Stack**.
+
+Se você é recrutador ou desenvolvedor, fique à vontade para entrar em contato ou deixar feedback.
